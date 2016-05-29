@@ -1,0 +1,18 @@
+(define-syntax require
+  (syntax-rules ()
+    ((_ namespace args-list ...)
+      (let ((env (current-env))
+            (args (apply make-hash 'args-list)))
+        (begin
+          (load "zeps/zeps/all")
+          (import-all "zeps")
+          (if (zeps:installed? namespace)
+            (load (++ (zeps:conf :install-home) namespace "/" namespace) env)
+            (zeps:die "Package " namespace " not installed."))
+          (if (in? args :import)
+            (let ((name (get-from args :as namespace)))
+              (map (lambda (to-import)
+                      (eval `(define ,(string->symbol (++ name ":" to-import))
+                              (import ,(++ namespace ":" to-import))) env))
+                   (args :import)))
+            (import-all namespace (get-from args :as namespace) env)))))))
