@@ -7,7 +7,7 @@
           (load "zeps/zeps/all")
           (import-all "zeps")
           (if (zeps:installed? namespace)
-            (load (++ (zeps:conf :install-home) namespace "/" namespace) env)
+            (load (++ ((zeps:get-conf) :install-home) namespace "/" namespace) env)
             (zeps:die "Package " namespace " not installed."))
           (if (in? args :import)
             (let ((name (get-from args :as namespace)))
